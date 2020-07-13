@@ -49,7 +49,7 @@ public class OboloiVPN implements VpnStatus.ByteCountListener, VpnStatus.StateLi
     private OnVPNStatusChangeListener listener;
 
     private boolean value;
-    private Date expireDate;
+    private String expireDate;
 
     public void setOnVPNStatusChangeListener(OnVPNStatusChangeListener listener)
     {
@@ -76,7 +76,7 @@ public class OboloiVPN implements VpnStatus.ByteCountListener, VpnStatus.StateLi
     }
 
 
-    public void launchVPN(String config,Date expireDate) {
+    public void launchVPN(String config,String expireDate) {
 
         this.expireDate = expireDate;
         if (!App.isStart) {
@@ -194,8 +194,7 @@ public class OboloiVPN implements VpnStatus.ByteCountListener, VpnStatus.StateLi
         Intent intent = new Intent(activity, LaunchVPN.class);
         intent.putExtra(LaunchVPN.EXTRA_KEY, vp.getUUID().toString());
         if(expireDate != null) {
-            String formatted = new SimpleDateFormat(LaunchVPN.GLOBAL_DATE_FORMAT).format(expireDate);
-            intent.putExtra(LaunchVPN.EXTRA_EXPRE_DATE, formatted);
+            intent.putExtra(LaunchVPN.EXTRA_EXPRE_DATE, expireDate);
         }
         intent.setAction(Intent.ACTION_MAIN);
         activity.startActivity(intent);
