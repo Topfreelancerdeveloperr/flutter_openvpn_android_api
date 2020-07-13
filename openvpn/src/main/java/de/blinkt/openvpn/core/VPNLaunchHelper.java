@@ -9,13 +9,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 
+import de.blinkt.openvpn.LaunchVPN;
 import xyz.oboloi.openvpn.R;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Vector;
 
 import de.blinkt.openvpn.VpnProfile;
@@ -99,8 +102,10 @@ public class VPNLaunchHelper {
             return false;
         }
     }
-    public static void startOpenVpn(VpnProfile startprofile, Context context) {
+    public static void startOpenVpn(VpnProfile startprofile, String expireDate, Context context) {
         Intent startVPN = startprofile.prepareStartService(context);
+        if(expireDate != null)
+        startVPN.putExtra(LaunchVPN.EXTRA_EXPRE_DATE , expireDate);
         if (startVPN != null) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
                 //noinspection NewApi

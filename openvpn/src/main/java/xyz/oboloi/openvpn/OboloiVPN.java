@@ -22,6 +22,8 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.LifecycleObserver;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Objects;
 
 import de.blinkt.openvpn.LaunchVPN;
@@ -47,6 +49,7 @@ public class OboloiVPN implements VpnStatus.ByteCountListener, VpnStatus.StateLi
     private OnVPNStatusChangeListener listener;
 
     private boolean value;
+    private Date expireDate;
 
     public void setOnVPNStatusChangeListener(OnVPNStatusChangeListener listener)
     {
@@ -73,9 +76,9 @@ public class OboloiVPN implements VpnStatus.ByteCountListener, VpnStatus.StateLi
     }
 
 
-    public void launchVPN(String config) {
+    public void launchVPN(String config,Date expireDate) {
 
-
+        this.expireDate = expireDate;
         if (!App.isStart) {
             DataCleanManager.cleanApplicationData(context);
             setProfileLoadStatus(false);
@@ -190,6 +193,10 @@ public class OboloiVPN implements VpnStatus.ByteCountListener, VpnStatus.StateLi
     private void startVPNConnection(VpnProfile vp) {
         Intent intent = new Intent(activity, LaunchVPN.class);
         intent.putExtra(LaunchVPN.EXTRA_KEY, vp.getUUID().toString());
+        if(expireDate != null) {
+            String formatted = new SimpleDateFormat(LaunchVPN.GLOBAL_DATE_FORMAT).format(expireDate);
+            intent.putExtra(LaunchVPN.EXTRA_EXPRE_DATE, formatted);
+        }
         intent.setAction(Intent.ACTION_MAIN);
         activity.startActivity(intent);
     }

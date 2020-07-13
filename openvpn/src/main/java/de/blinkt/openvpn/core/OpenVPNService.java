@@ -50,7 +50,10 @@ import java.lang.reflect.Method;
 import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Locale;
 import java.util.Vector;
 
@@ -95,6 +98,7 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
     private long mConnecttime;
     private boolean mOvpn3 = false;
     private OpenVPNManagement mManagement;
+    private Date expireDate;
     private final IBinder mBinder = new IOpenVPNServiceInternal.Stub() {
         @Override
         public boolean protect(int fd) throws RemoteException {
@@ -413,7 +417,7 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
     }
 
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
+    public int onStartCommand(final Intent intent, int flags, int startId) {
         if (intent != null && intent.getBooleanExtra(ALWAYS_SHOW_NOTIFICATION, false))
             mNotificationAlwaysVisible = true;
         VpnStatus.addStateListener(this);
@@ -460,6 +464,31 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
             @Override
             public void run() {
                 startOpenVPN();
+                boolean hasExpireDate = false;
+                    try {
+                        expireDate = new SimpleDateFormat(LaunchVPN.GLOBAL_DATE_FORMAT).parse(intent.getStringExtra(LaunchVPN.EXTRA_EXPRE_DATE));
+                        hasExpireDate = true;
+                    }catch (Exception error){
+                        hasExpireDate = false;
+                        String date = intent.getStringExtra(LaunchVPN.EXTRA_EXPRE_DATE);
+                        if(date == null) date = "null";
+                        Log.e("date is shit in service" , error.toString() + " shitty date : " + date);
+                    }
+                    if(hasExpireDate)
+                    while (true) {
+                        try {
+                            Thread.sleep(60000);
+                            Date currentTime = Calendar.getInstance().getTime();
+                            if(currentTime.after(expireDate)) {
+                                stopVPN(false);
+                                break;
+                            }
+                        } catch (Exception err) {
+                            Log.e("wtf error", err.toString());
+                            break;
+                        }
+                    }
+
             }
         }).start();
         ProfileManager.setConnectedVpnProfile(this, mProfile);

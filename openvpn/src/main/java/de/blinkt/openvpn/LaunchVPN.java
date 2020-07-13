@@ -33,6 +33,8 @@ import android.widget.EditText;
 import xyz.oboloi.openvpn.R;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import de.blinkt.openvpn.core.ConnectionStatus;
 import de.blinkt.openvpn.core.IServiceStatus;
@@ -72,13 +74,16 @@ public class LaunchVPN extends Activity {
     public static final String EXTRA_KEY = "de.blinkt.openvpn.shortcutProfileUUID";
     public static final String EXTRA_NAME = "de.blinkt.openvpn.shortcutProfileName";
     public static final String EXTRA_HIDELOG = "de.blinkt.openvpn.showNoLogWindow";
+    public static final String EXTRA_EXPRE_DATE = "de.blinkt.openvpn.expiredate";
     public static final String CLEARLOG = "clearlogconnect";
+    public static final String GLOBAL_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
     private static final int START_VPN_PROFILE = 70;
     private VpnProfile mSelectedProfile;
     private boolean mhideLog = false;
     private boolean mCmfixed = false;
     private String mTransientAuthPW;
     private String mTransientCertOrPCKS12PW;
+    private String expireDate;
     private ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder binder) {
@@ -111,6 +116,7 @@ public class LaunchVPN extends Activity {
         final Intent intent = getIntent();
         final String action = intent.getAction();
         // If the intent is a request to create a shortcut, we'll do that and exit
+        expireDate = intent.getStringExtra(LaunchVPN.EXTRA_EXPRE_DATE);
         if (Intent.ACTION_MAIN.equals(action)) {
             // Check if we need to clear the log
             if (Preferences.getDefaultSharedPreferences(this).getBoolean(CLEARLOG, true)) VpnStatus.clearLog();
@@ -199,7 +205,7 @@ public class LaunchVPN extends Activity {
                     boolean showLogWindow = prefs.getBoolean("showlogwindow", true);
                     if (!mhideLog && showLogWindow) showLogWindow();
                     ProfileManager.updateLRU(this, mSelectedProfile);
-                    VPNLaunchHelper.startOpenVpn(mSelectedProfile, getBaseContext());
+                    VPNLaunchHelper.startOpenVpn(mSelectedProfile, expireDate , getBaseContext());
                     finish();
                 }
             } else if (resultCode == Activity.RESULT_CANCELED) {
