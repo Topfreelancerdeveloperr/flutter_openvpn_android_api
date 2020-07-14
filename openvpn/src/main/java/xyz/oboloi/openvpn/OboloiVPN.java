@@ -31,12 +31,13 @@ import de.blinkt.openvpn.VpnProfile;
 import de.blinkt.openvpn.core.App;
 import de.blinkt.openvpn.core.ConnectionStatus;
 import de.blinkt.openvpn.core.IOpenVPNServiceInternal;
+import de.blinkt.openvpn.core.LogItem;
 import de.blinkt.openvpn.core.OpenVPNService;
 import de.blinkt.openvpn.core.ProfileManager;
 import de.blinkt.openvpn.core.VpnStatus;
 
 
-public class OboloiVPN implements VpnStatus.ByteCountListener, VpnStatus.StateListener {
+public class OboloiVPN implements VpnStatus.ByteCountListener, VpnStatus.StateListener,VpnStatus.LogListener {
 
     //    final OboloiVPN ourInstance = new OboloiVPN();
     private static IOpenVPNServiceInternal mService;
@@ -53,6 +54,9 @@ public class OboloiVPN implements VpnStatus.ByteCountListener, VpnStatus.StateLi
 
     public void setOnVPNStatusChangeListener(OnVPNStatusChangeListener listener)
     {
+        VpnStatus.addStateListener(this);
+        VpnStatus.addByteCountListener(this);
+        VpnStatus.addLogListener(this);
         this.listener = listener;
     }
 
@@ -123,11 +127,13 @@ public class OboloiVPN implements VpnStatus.ByteCountListener, VpnStatus.StateLi
     public void onStop() {
         VpnStatus.removeStateListener(this);
         VpnStatus.removeByteCountListener(this);
+        VpnStatus.removeLogListener(this);
     }
 
     public void onResume() {
         VpnStatus.addStateListener(this);
         VpnStatus.addByteCountListener(this);
+        VpnStatus.addLogListener(this);
         Intent intent = new Intent(activity, OpenVPNService.class);
         intent.setAction(OpenVPNService.START_SERVICE);
         activity.bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
@@ -219,6 +225,7 @@ public class OboloiVPN implements VpnStatus.ByteCountListener, VpnStatus.StateLi
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                Log.d("superman" , state == null ? "null" : state);
                 if (state.equals("CONNECTED")) {
                     Log.e("status", "connected");
                     App.isStart = true;
@@ -246,6 +253,10 @@ public class OboloiVPN implements VpnStatus.ByteCountListener, VpnStatus.StateLi
     }
 
 
+    @Override
+    public void newLog(LogItem logItem) {
+       Log.d("LOGS" , logItem.getString(context));
+    }
 }
 
 
