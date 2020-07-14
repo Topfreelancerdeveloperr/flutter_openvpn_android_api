@@ -180,10 +180,7 @@ public class OboloiVPN implements VpnStatus.ByteCountListener, VpnStatus.StateLi
     {
         this.value = value;
 
-        if(listener != null)
-        {
-            listener.onVPNStatusChanged(value);
-        }
+
     }
 
     private void setProfileLoadStatus(boolean profileStatus){
@@ -225,7 +222,10 @@ public class OboloiVPN implements VpnStatus.ByteCountListener, VpnStatus.StateLi
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                Log.d("superman" , state == null ? "null" : state);
+                if(listener != null)
+                {
+                    listener.onVPNStatusChanged(state);
+                }
                 if (state.equals("CONNECTED")) {
 
                     App.isStart = true;
