@@ -227,7 +227,7 @@ public class OboloiVPN implements VpnStatus.ByteCountListener, VpnStatus.StateLi
             public void run() {
                 Log.d("superman" , state == null ? "null" : state);
                 if (state.equals("CONNECTED")) {
-                    Log.e("status", "connected");
+
                     App.isStart = true;
                     setVPNStatus(true);
                 }
@@ -255,7 +255,7 @@ public class OboloiVPN implements VpnStatus.ByteCountListener, VpnStatus.StateLi
 
     @Override
     public void newLog(LogItem logItem) {
-       Log.d("LOGS" , logItem.getString(context));
+
     }
 }
 

@@ -943,7 +943,6 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
             } else if (level == LEVEL_CONNECTED) {
                 mDisplayBytecount = true;
                 mConnecttime = System.currentTimeMillis();
-                VpnStatus.updateStateString(state,logmessage,resid,level);
                 if (!runningOnAndroidTV()) channel = NOTIFICATION_CHANNEL_BG_ID;
             } else {
                 mDisplayBytecount = false;
