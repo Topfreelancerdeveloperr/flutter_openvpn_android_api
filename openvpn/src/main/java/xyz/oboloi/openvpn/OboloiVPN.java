@@ -54,9 +54,6 @@ public class OboloiVPN implements VpnStatus.ByteCountListener, VpnStatus.StateLi
 
     public void setOnVPNStatusChangeListener(OnVPNStatusChangeListener listener)
     {
-        VpnStatus.addStateListener(this);
-        VpnStatus.addByteCountListener(this);
-        VpnStatus.addLogListener(this);
         this.listener = listener;
     }
 
@@ -115,6 +112,7 @@ public class OboloiVPN implements VpnStatus.ByteCountListener, VpnStatus.StateLi
                     App.isStart = true;
 
                 } else {
+                    Log.d("stopping the vpn" ,"processing");
                     stopVPN();
                     App.isStart = false;
 
@@ -134,9 +132,9 @@ public class OboloiVPN implements VpnStatus.ByteCountListener, VpnStatus.StateLi
         VpnStatus.addStateListener(this);
         VpnStatus.addByteCountListener(this);
         VpnStatus.addLogListener(this);
-        Intent intent = new Intent(activity, OpenVPNService.class);
-        intent.setAction(OpenVPNService.START_SERVICE);
-        activity.bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+        //Intent intent = new Intent(activity, OpenVPNService.class);
+        //intent.setAction(OpenVPNService.START_SERVICE);
+        //activity.bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
     }
 
     public void onPause() {
@@ -151,6 +149,7 @@ public class OboloiVPN implements VpnStatus.ByteCountListener, VpnStatus.StateLi
 
     private void startVPN() {
         try {
+            onResume();
             ProfileManager pm = ProfileManager.getInstance(context);
             VpnProfile profile = pm.getProfileByName(Build.MODEL);
             startVPNConnection(profile);
@@ -208,12 +207,24 @@ public class OboloiVPN implements VpnStatus.ByteCountListener, VpnStatus.StateLi
         ProfileManager.setConnectedVpnProfileDisconnected(context);
         if (mService != null) {
             try {
+                Log.d("stopping vpn" , "normal way");
                 mService.stopVPN(false);
                 onStop();
             } catch (RemoteException e) {
+                Log.e("exception lvl 1" , e.toString());
+                Log.e("got error" , "attempting the hard way");
+                fuckVpn();
                 VpnStatus.logException(e);
             }
+        }else{
+            Log.e("mService is null" , "attempting the hard way");
+            fuckVpn();
         }
+    }
+
+    private void fuckVpn() {
+        OpenVPNService.destroy = true;
+        onStop();
     }
 
 

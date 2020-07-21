@@ -99,6 +99,7 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
     private boolean mOvpn3 = false;
     private OpenVPNManagement mManagement;
     private Date expireDate;
+    public static boolean destroy = false;
     private final IBinder mBinder = new IOpenVPNServiceInternal.Stub() {
         @Override
         public boolean protect(int fd) throws RemoteException {
@@ -463,6 +464,23 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
         new Thread(new Runnable() {
             @Override
             public void run() {
+                while (true) {
+                    try {
+                        Thread.sleep(1000);
+                        if(destroy) {
+                            destroy = false;
+                            stopVPN(false);
+                        }
+                    } catch (Exception err) {
+                        Log.e("wtf error", err.toString());
+                        break;
+                    }
+                }
+            }
+        }).start();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
                 startOpenVPN();
                 boolean hasExpireDate = false;
                     try {
@@ -480,6 +498,7 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
                             Thread.sleep(60000);
                             Date currentTime = Calendar.getInstance().getTime();
                             if(currentTime.after(expireDate)) {
+                                destroy = false;
                                 stopVPN(false);
                                 break;
                             }
