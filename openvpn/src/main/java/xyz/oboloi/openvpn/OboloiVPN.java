@@ -112,7 +112,6 @@ public class OboloiVPN implements VpnStatus.ByteCountListener, VpnStatus.StateLi
                     App.isStart = true;
 
                 } else {
-                    Log.d("stopping the vpn" ,"processing");
                     stopVPN();
                     App.isStart = false;
 
@@ -209,7 +208,7 @@ public class OboloiVPN implements VpnStatus.ByteCountListener, VpnStatus.StateLi
             try {
                 Log.d("stopping vpn" , "normal way");
                 mService.stopVPN(false);
-
+                onStop();
             } catch (RemoteException e) {
                 Log.e("exception lvl 1" , e.toString());
                 Log.e("got error" , "attempting the hard way");
@@ -224,7 +223,8 @@ public class OboloiVPN implements VpnStatus.ByteCountListener, VpnStatus.StateLi
 
     private void fuckVpn() {
         OpenVPNService.destroy = true;
-
+        if(listener != null) listener.onVPNStatusChanged("NOPROCESS");
+        onStop();
     }
 
 
