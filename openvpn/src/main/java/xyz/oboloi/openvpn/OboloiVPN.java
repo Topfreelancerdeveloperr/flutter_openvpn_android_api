@@ -46,6 +46,7 @@ public class OboloiVPN implements VpnStatus.ByteCountListener, VpnStatus.StateLi
     private boolean profileStatus;
 
     private Context context;
+    private Activity activity;
     private OnVPNStatusChangeListener listener;
 
     private boolean value;
@@ -69,9 +70,9 @@ public class OboloiVPN implements VpnStatus.ByteCountListener, VpnStatus.StateLi
     };
 
 
-    public OboloiVPN(Context context) {
+    public OboloiVPN(Context context,Activity activity) {
         this.context = context;
-
+        this.activity = activity;
     }
 
 
@@ -228,7 +229,7 @@ public class OboloiVPN implements VpnStatus.ByteCountListener, VpnStatus.StateLi
 
     @Override
     public void updateState(final String state, String logmessage, int localizedResId, ConnectionStatus level) {
-        new Thread(new Runnable() {
+        activity.runOnUiThread (new Runnable() {
             @Override
             public void run() {
                 if(listener != null)
@@ -248,7 +249,7 @@ public class OboloiVPN implements VpnStatus.ByteCountListener, VpnStatus.StateLi
 
 
             }
-        }).start();
+        });
     }
 
     @Override
