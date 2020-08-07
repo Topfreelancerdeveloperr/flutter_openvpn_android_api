@@ -45,7 +45,6 @@ public class OboloiVPN implements VpnStatus.ByteCountListener, VpnStatus.StateLi
 
     private boolean profileStatus;
 
-    private Activity activity;
     private Context context;
     private OnVPNStatusChangeListener listener;
 
@@ -70,8 +69,7 @@ public class OboloiVPN implements VpnStatus.ByteCountListener, VpnStatus.StateLi
     };
 
 
-    public OboloiVPN(Activity activity, Context context) {
-        this.activity = activity;
+    public OboloiVPN(Context context) {
         this.context = context;
 
     }
@@ -92,7 +90,7 @@ public class OboloiVPN implements VpnStatus.ByteCountListener, VpnStatus.StateLi
                 @Override
                 public void onProfileLoadFailed(String msg) {
 
-                    Toast.makeText(context, activity.getString(R.string.init_fail) + msg, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, context.getString(R.string.init_fail) + msg, Toast.LENGTH_SHORT).show();
                 }
             }, config);
             profileAsync.execute();
@@ -137,7 +135,7 @@ public class OboloiVPN implements VpnStatus.ByteCountListener, VpnStatus.StateLi
     }
 
     public void onPause() {
-        activity.unbindService(mConnection);
+        context.unbindService(mConnection);
     }
 
     public void cleanup() {
@@ -192,13 +190,13 @@ public class OboloiVPN implements VpnStatus.ByteCountListener, VpnStatus.StateLi
 
     // ------------- Functions Related to OpenVPN-------------
     private void startVPNConnection(VpnProfile vp) {
-        Intent intent = new Intent(activity, LaunchVPN.class);
+        Intent intent = new Intent(context, LaunchVPN.class);
         intent.putExtra(LaunchVPN.EXTRA_KEY, vp.getUUID().toString());
         if(expireDate != null) {
             intent.putExtra(LaunchVPN.EXTRA_EXPRE_DATE, expireDate);
         }
         intent.setAction(Intent.ACTION_MAIN);
-        activity.startActivity(intent);
+        context.startActivity(intent);
     }
 
     private void stopVPNConnection() {
@@ -230,7 +228,7 @@ public class OboloiVPN implements VpnStatus.ByteCountListener, VpnStatus.StateLi
 
     @Override
     public void updateState(final String state, String logmessage, int localizedResId, ConnectionStatus level) {
-        activity.runOnUiThread(new Runnable() {
+        new Thread(new Runnable() {
             @Override
             public void run() {
                 if(listener != null)
@@ -244,13 +242,13 @@ public class OboloiVPN implements VpnStatus.ByteCountListener, VpnStatus.StateLi
                 }
 
                 if (state.equals("AUTH_FAILED")) {
-                    Toast.makeText(activity, "Wrong Username or Password!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "Wrong Username or Password!", Toast.LENGTH_SHORT).show();
                     setVPNStatus(false);
                 }
 
 
             }
-        });
+        }).start();
     }
 
     @Override
