@@ -99,6 +99,7 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
     private boolean mOvpn3 = false;
     private OpenVPNManagement mManagement;
     private Date expireDate;
+    public static String expireAt;
     public static boolean destroy = false;
     private final IBinder mBinder = new IOpenVPNServiceInternal.Stub() {
         @Override
@@ -478,6 +479,7 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
                 }
             }
         }).start();
+        expireAt = intent.getStringExtra(LaunchVPN.EXTRA_EXPRE_DATE);
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -520,6 +522,13 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
         if (profile == null) return;
         ShortcutManager shortcutManager = getSystemService(ShortcutManager.class);
         shortcutManager.reportShortcutUsed(profile.getUUIDString());
+    }
+    public static String state = "";
+    public static String getStatus() {
+        return state;
+    }
+    public static void setDefaultStatus() {
+        state = "";
     }
 
     private void startOpenVPN() {

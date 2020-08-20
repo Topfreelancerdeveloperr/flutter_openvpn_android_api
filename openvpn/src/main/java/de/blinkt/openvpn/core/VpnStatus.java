@@ -267,6 +267,7 @@ public class VpnStatus {
         mLastLevel = level;
         for (StateListener sl : stateListener) {
             sl.updateState(state, msg, resid, level);
+            OpenVPNService.state = state;
         }
         newLogItem(new LogItem((LogLevel.DEBUG), String.format("New OpenVPN Status (%s->%s): %s", state, level.toString(), msg)));
     }

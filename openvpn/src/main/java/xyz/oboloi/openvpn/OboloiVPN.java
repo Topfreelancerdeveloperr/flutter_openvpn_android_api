@@ -33,6 +33,7 @@ import de.blinkt.openvpn.core.ConnectionStatus;
 import de.blinkt.openvpn.core.IOpenVPNServiceInternal;
 import de.blinkt.openvpn.core.LogItem;
 import de.blinkt.openvpn.core.OpenVPNService;
+import de.blinkt.openvpn.core.OpenVPNStatusService;
 import de.blinkt.openvpn.core.ProfileManager;
 import de.blinkt.openvpn.core.VpnStatus;
 
@@ -226,6 +227,10 @@ public class OboloiVPN implements VpnStatus.ByteCountListener, VpnStatus.StateLi
         onStop();
     }
 
+    public String getServiceStatus() {
+        return null;
+    }
+
 
     @Override
     public void updateState(final String state, String logmessage, int localizedResId, ConnectionStatus level) {
@@ -235,6 +240,9 @@ public class OboloiVPN implements VpnStatus.ByteCountListener, VpnStatus.StateLi
                 if(listener != null)
                 {
                     listener.onVPNStatusChanged(state);
+                }
+                if(state.equals("DISCONNECTED")){
+                    OpenVPNService.setDefaultStatus();
                 }
                 if (state.equals("CONNECTED")) {
 
